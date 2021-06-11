@@ -30,13 +30,6 @@ open class DepictionBaseView: UIView, DepictionViewProtocol {
             return nil
         }
         
-        if className == "DepictionMarkdownView" {
-            if let rawFormat = dictionary["useRawFormat"] as? Bool,
-                rawFormat == true {
-                className = "DepictionMarkdownViewSlow"
-            }
-        }
-        
         guard let rawclass = Bundle.main.classNamed("Sileo.\(className)") as? DepictionBaseView.Type else {
             return nil
         }
