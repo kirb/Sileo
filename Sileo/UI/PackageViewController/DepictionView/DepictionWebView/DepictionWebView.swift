@@ -69,16 +69,15 @@ class DepictionWebView: DepictionBaseView {
     }
 
     override func depictionHeight(width: CGFloat) -> CGFloat {
-        height
+        let fittingWidth = min(self.width, width - 32)
+        return (self.height / self.width) * fittingWidth
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        var width = self.width
-        if width > self.bounds.width {
-            width = self.bounds.width
-        }
+        let width = min(self.width, self.bounds.width - 32)
+        let height = (self.height / self.width) * width
 
         var x = CGFloat(0)
         switch alignment {
