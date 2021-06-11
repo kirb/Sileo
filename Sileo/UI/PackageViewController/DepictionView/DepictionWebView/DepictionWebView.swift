@@ -31,6 +31,7 @@ class DepictionWebView: DepictionBaseView {
         self.width = width
         self.height = height
         alignment = (dictionary["alignment"] as? Int) ?? 0
+        let cornerRadius = (dictionary["cornerRadius"] as? CGFloat) ?? 0
 
         guard viewController is PackageViewController else {
             return nil
@@ -61,6 +62,8 @@ class DepictionWebView: DepictionBaseView {
         webView?.scrollView.isScrollEnabled = false
         webView?.navigationDelegate = self
         webView?.uiDelegate = self
+        webView?.clipsToBounds = true
+        webView?.layer.cornerRadius = cornerRadius
         self.addSubview(webView!)
     }
 
