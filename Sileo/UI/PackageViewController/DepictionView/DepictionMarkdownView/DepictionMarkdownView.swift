@@ -20,8 +20,8 @@ class DepictionMarkdownView: DepictionBaseView {
         configuration.ignoresViewportScaleLimits = false
         configuration.dataDetectorTypes = []
         configuration.preferences.javaScriptEnabled = false
+        configuration._overrideContentSecurityPolicy = "default-src data:; style-src data: 'unsafe-inline'; child-src 'none'; sandbox"
         if #available(iOS 14, *) {
-            configuration.limitsNavigationsToAppBoundDomains = true
             configuration._loadsSubresources = false
         }
         if #available(iOS 15, *) {
