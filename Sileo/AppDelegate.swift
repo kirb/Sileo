@@ -9,6 +9,7 @@
 import Foundation
 import UserNotifications
 
+@UIApplicationMain
 class SileoAppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegate {
     public var window: UIWindow?
     

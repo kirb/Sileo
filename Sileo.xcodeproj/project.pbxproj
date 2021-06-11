@@ -364,8 +364,6 @@
 		F18383F520FBFFB700450EED /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F18383F420FBFFB700450EED /* libiconv.tbd */; };
 		F183CFB02318D1FF00D3AF3B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F183CFAF2318D1FF00D3AF3B /* AppDelegate.swift */; };
 		F183CFB12318D1FF00D3AF3B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F183CFAF2318D1FF00D3AF3B /* AppDelegate.swift */; };
-		F183CFB32318EA6800D3AF3B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = F183CFB22318EA6800D3AF3B /* main.swift */; };
-		F183CFB42318EA6800D3AF3B /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = F183CFB22318EA6800D3AF3B /* main.swift */; };
 		F183CFC32318F48600D3AF3B /* RepoScraper in Resources */ = {isa = PBXBuildFile; fileRef = F183CFC22318F48600D3AF3B /* RepoScraper */; };
 		F183CFC42318F48600D3AF3B /* RepoScraper in Resources */ = {isa = PBXBuildFile; fileRef = F183CFC22318F48600D3AF3B /* RepoScraper */; };
 		F183CFC7231A563500D3AF3B /* PackageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F183CFC6231A563500D3AF3B /* PackageViewController.swift */; };
@@ -950,7 +948,6 @@
 		F178CD8821323E3800F927FA /* DownloadsTableViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DownloadsTableViewController.xib; sourceTree = "<group>"; };
 		F18383F420FBFFB700450EED /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		F183CFAF2318D1FF00D3AF3B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F183CFB22318EA6800D3AF3B /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		F183CFC22318F48600D3AF3B /* RepoScraper */ = {isa = PBXFileReference; lastKnownFileType = folder; path = RepoScraper; sourceTree = "<group>"; };
 		F183CFC6231A563500D3AF3B /* PackageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageViewController.swift; sourceTree = "<group>"; };
 		F18B58472581A7E90064CD71 /* CSActionItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSActionItem.swift; sourceTree = "<group>"; };
@@ -1872,7 +1869,6 @@
 		F149E0AF20B6040B005CA30B /* Sileo */ = {
 			isa = PBXGroup;
 			children = (
-				F183CFB22318EA6800D3AF3B /* main.swift */,
 				F183CFAF2318D1FF00D3AF3B /* AppDelegate.swift */,
 				F1B99EE720DB671B00374C27 /* Backend */,
 				F1B3960420E5AFCE00AF3D04 /* Contrib */,
@@ -3170,7 +3166,6 @@
 				E14C5EBE266687C80080BFCE /* XZ.swift in Sources */,
 				F139D0DC22EA9209007F5C0D /* ZKSwizzle.m in Sources */,
 				FBBD003B240C31B4008E11B2 /* NewsArticleCollectionViewCell.swift in Sources */,
-				F183CFB42318EA6800D3AF3B /* main.swift in Sources */,
 				F139D11B22EA9209007F5C0D /* RootWrapper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3353,7 +3348,6 @@
 				56A5989B214657A700677FCA /* ZKSwizzle.m in Sources */,
 				E14C5EBD266687C80080BFCE /* XZ.swift in Sources */,
 				FBBD003A240C31B4008E11B2 /* NewsArticleCollectionViewCell.swift in Sources */,
-				F183CFB32318EA6800D3AF3B /* main.swift in Sources */,
 				FBDE129B24A91A2800138A7E /* PaymentAuthenticator.swift in Sources */,
 				F170DD7D22CFE79800196FDA /* RootWrapper.swift in Sources */,
 			);
