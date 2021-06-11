@@ -7,9 +7,16 @@
 //
 
 import Foundation
+import WebKit
+
+extension NSAttributedString.DocumentReadingOptionKey {
+    // Defined in AppKit on macOS, but no equivalent export exists on iOS, despite being mentioned
+    // in <WebKit/NSAttributedString.h>.
+    static let timeout = Self(rawValue: "Timeout")
+}
 
 class DepictionMarkdownViewSlow: DepictionBaseView, CSTextViewActionHandler {
-    var attributedString: NSMutableAttributedString?
+    var attributedString: NSAttributedString?
     var htmlString: String = ""
 
     let useSpacing: Bool
@@ -38,9 +45,6 @@ class DepictionMarkdownViewSlow: DepictionBaseView, CSTextViewActionHandler {
         htmlString = markdown
 
         reloadMarkdown()
-        guard attributedString != nil else {
-            return nil
-        }
 
         textView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -74,28 +78,50 @@ class DepictionMarkdownViewSlow: DepictionBaseView, CSTextViewActionHandler {
     }
     
     @objc func reloadMarkdown() {
-        var red = CGFloat(0)
-        var green = CGFloat(0)
-        var blue = CGFloat(0)
-        var alpha = CGFloat(0)
-        tintColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-        red *= 255
-        green *= 255
-        blue *= 255
-        
-        var textColorString = ""
-        if UIColor.isDarkModeEnabled {
-            textColorString = "color: white;"
+        let htmlString = """
+        <html>
+        <style>
+        body {
+            font: -apple-system-body;
+            color: \(UIColor.sileoLabel.cssString);
+            -webkit-text-size-adjust: none;
         }
-        
-        // swiftlint:disable:next line_length
-        let htmlString = String(format: "<style>body{font-family: '-apple-system', 'HelveticaNeue'; font-size:12pt;\(textColorString)} a{text-decoration:none; color:rgba(%.0f,%.0f,%.0f,%.2f)}</style>", red, green, blue, alpha).appending(self.htmlString)
-        // swiftlint:disable:next line_length
-        if let attributedString = try? NSMutableAttributedString(data: htmlString.data(using: .unicode) ?? "".data(using: .utf8)!, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
-            attributedString.removeAttribute(NSAttributedString.Key("NSOriginalFont"), range: NSRange(location: 0, length: attributedString.length))
-            textView.attributedText = attributedString
+        a {
+            text-decoration: none;
+            color: \(tintColor.cssString);
+        }
+        </style>
+        <body>\(self.htmlString)</body>
+        </html>
+        """
+
+        let attributedStringCompletion: (NSAttributedString) -> Void = { attributedString in
+            self.textView.attributedText = attributedString
             self.attributedString = attributedString
-            textView.setNeedsDisplay()
+            self.textView.setNeedsDisplay()
+        }
+
+        if #available(iOS 13, *) {
+            NSAttributedString.loadFromHTML(string: htmlString, options: [
+                .characterEncoding: String.Encoding.utf8,
+                .timeout: 1
+            ]) { attributedString, _, error in
+                guard let attributedString = attributedString else {
+                    if let error = error {
+                        NSLog("Failed to load HTML: %@", error as NSError)
+                    }
+                    return
+                }
+                attributedStringCompletion(attributedString)
+                self.setNeedsLayout()
+            }
+        } else {
+            // swiftlint:disable:next line_length
+            if let attributedString = try? NSMutableAttributedString(data: htmlString.data(using: .unicode) ?? "".data(using: .utf8)!, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
+                // swiftlint:disable:next line_length
+                attributedString.removeAttribute(NSAttributedString.Key("NSOriginalFont"), range: NSRange(location: 0, length: attributedString.length))
+                attributedStringCompletion(attributedString)
+            }
         }
     }
 
