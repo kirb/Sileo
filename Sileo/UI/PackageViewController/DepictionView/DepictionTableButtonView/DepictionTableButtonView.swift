@@ -9,8 +9,7 @@
 import Foundation
 
 class DepictionTableButtonView: DepictionBaseView, UIGestureRecognizerDelegate {
-    private var selectionView: UIView
-    private var titleLabel: UILabel
+    private var button: UIButton
     private var chevronView: UIImageView
     private var repoIcon: UIImageView?
 
@@ -28,8 +27,7 @@ class DepictionTableButtonView: DepictionBaseView, UIGestureRecognizerDelegate {
             return nil
         }
 
-        selectionView = UIView(frame: .zero)
-        titleLabel = UILabel(frame: .zero)
+        button = UIButton(type: .custom)
         chevronView = UIImageView(image: UIImage(named: "Chevron")?.withRenderingMode(.alwaysTemplate))
 
         self.action = action
@@ -38,7 +36,21 @@ class DepictionTableButtonView: DepictionBaseView, UIGestureRecognizerDelegate {
         openExternal = (dictionary["openExternal"] as? Bool) ?? false
 
         super.init(dictionary: dictionary, viewController: viewController, tintColor: tintColor, isActionable: isActionable)
-        
+
+        let highlightImage = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
+            UIColor.sileoHighlightColor.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        }
+
+        button.setTitle(title, for: .normal)
+        button.titleLabel!.font = UIFont.systemFont(ofSize: 17)
+        button.contentHorizontalAlignment = .leading
+        button.setBackgroundImage(highlightImage, for: .highlighted)
+        button.addTarget(self, action: #selector(self.buttonTapped), for: .touchUpInside)
+        self.addSubview(button)
+
+        self.addSubview(chevronView)
+
         if let repo = dictionary["_repo"] as? String {
             repoIcon = UIImageView(frame: .zero)
             repoIcon?.layer.masksToBounds = true
@@ -46,22 +58,6 @@ class DepictionTableButtonView: DepictionBaseView, UIGestureRecognizerDelegate {
             loadRepoImage(repo)
             self.addSubview(repoIcon!)
         }
-        
-        titleLabel.text = title
-        titleLabel.textAlignment = .left
-        titleLabel.font = UIFont.systemFont(ofSize: 17)
-        self.addSubview(titleLabel)
-
-        self.addSubview(chevronView)
-        
-        let tapGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(DepictionTableButtonView.buttonTapped))
-        tapGestureRecognizer.minimumPressDuration = 0.05
-        tapGestureRecognizer.delegate = self
-        self.addGestureRecognizer(tapGestureRecognizer)
-
-        self.accessibilityTraits = .link
-        self.isAccessibilityElement = true
-        self.accessibilityLabel = titleLabel.text
     }
     
     private func loadRepoImage(_ repo: String) {
@@ -97,21 +93,18 @@ class DepictionTableButtonView: DepictionBaseView, UIGestureRecognizerDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        titleLabel.textColor = self.tintColor
+        button.setTitleColor(self.tintColor, for: .normal)
         chevronView.tintColor = self.tintColor
 
-        var containerFrame = self.bounds
-        containerFrame.origin.x = 16
-        containerFrame.size.width -= 32
+        button.frame = self.bounds.insetBy(dx: 0, dy: -1)
 
-        selectionView.frame = self.bounds
         if let repoIcon = repoIcon {
-            repoIcon.frame = CGRect(x: containerFrame.minX, y: 4.5, width: 35, height: 35)
-            titleLabel.frame = CGRect(x: containerFrame.minX + 40, y: 12, width: containerFrame.width - 60, height: 20.0)
+            repoIcon.frame = CGRect(x: 16, y: 4.5, width: 35, height: 35)
+            button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 16 + 40, bottom: 0, right: 44)
         } else {
-            titleLabel.frame = CGRect(x: containerFrame.minX, y: 12, width: containerFrame.width - 20, height: 20.0)
+            button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 44)
         }
-        chevronView.frame = CGRect(x: containerFrame.maxX - 9, y: 15, width: 7, height: 13)
+        chevronView.frame = CGRect(x: self.bounds.size.width - 16 - 9, y: 15, width: 7, height: 13)
     }
 
     override func accessibilityActivate() -> Bool {
@@ -119,19 +112,7 @@ class DepictionTableButtonView: DepictionBaseView, UIGestureRecognizerDelegate {
         return true
     }
 
-    @objc func buttonTapped(_ gestureRecognizer: UIGestureRecognizer?) {
-        if let gestureRecognizer = gestureRecognizer {
-            if gestureRecognizer.state == .began {
-                selectionView.alpha = 1
-            } else if gestureRecognizer.state == .ended || gestureRecognizer.state == .cancelled || gestureRecognizer.state == .failed {
-                selectionView.alpha = 0
-            }
-
-            if gestureRecognizer.state != .ended {
-                return
-            }
-        }
-
+    @objc func buttonTapped(_ sender: UIButton?) {
         if !self.processAction(action) {
             self.processAction(backupAction)
         }
