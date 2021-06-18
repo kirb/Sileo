@@ -18,6 +18,7 @@ final class Package: Hashable, Equatable {
     public var packageDescription: String?
     public var legacyDepiction: String?
     public var depiction: String?
+    public var support: String?
     public var icon: String?
     public var sourceFile: String?
     public var source: String?

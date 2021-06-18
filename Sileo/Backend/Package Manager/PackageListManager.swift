@@ -159,6 +159,7 @@ final class PackageListManager {
         package.packageDescription = dictionary["description"]
         package.legacyDepiction = dictionary["depiction"]
         package.depiction = dictionary["sileodepiction"]
+        package.support = dictionary["support"]
         
         package.tags = packageEnum.1
         if package.tags.contains(.commercial) {

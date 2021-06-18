@@ -580,6 +580,11 @@ class PackageViewController: SileoViewController, PackageQueueButtonDataProvider
             sharePopup.addAction(moreByDeveloper)
         
             let packageSupport = UIAlertAction(title: String(localizationKey: "Package_Support_Action"), style: .default) { _ in
+                if let support = URL(string: package.support ?? ""),
+                   support.scheme == "http" || support.scheme == "https",
+                   DepictionButton.processAction(support.absoluteString, parentViewController: self, openExternal: false) {
+                    return
+                }
                 if let url = URLManager.supportEmailURL(to: email, for: package.name ?? package.packageID),
                    DepictionButton.processAction(url.absoluteString, parentViewController: self, openExternal: false) {
                     return
