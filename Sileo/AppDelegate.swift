@@ -284,12 +284,4 @@ class SileoAppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDe
         }
         return true
     }
-    
-    func applicationDidEnterBackground(_ application: UIApplication) {
-        UIColor.isTransitionLockedForiOS13Bug = true
-    }
-    
-    func applicationWillEnterForeground(_ application: UIApplication) {
-        UIColor.isTransitionLockedForiOS13Bug = false
-    }
 }

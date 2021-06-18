@@ -97,11 +97,8 @@ class DepictionMarkdownView: DepictionBaseView {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        if #available(iOS 13, *) {
-            if !UIColor.isTransitionLockedForiOS13Bug {
-                self.reloadMarkdown()
-            }
-        }
+        super.traitCollectionDidChange(previousTraitCollection)
+        self.reloadMarkdown()
     }
     
     @objc func reloadMarkdown() {
