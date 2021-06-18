@@ -41,6 +41,8 @@ class DepictionSeparatorView: DepictionBaseView {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        separatorView?.frame = CGRect(x: 16, y: 1, width: self.bounds.width - 32, height: 1)
+        let height = 1 / (window?.screen.scale ?? 1)
+
+        separatorView?.frame = CGRect(x: 16, y: (self.bounds.height - height) / 2, width: self.bounds.width - 32, height: height)
     }
 }
