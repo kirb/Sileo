@@ -107,15 +107,23 @@ class DepictionMarkdownView: DepictionBaseView {
     @objc func reloadMarkdown() {
         let htmlString = """
         <!DOCTYPE html>
-        <html>
+        <html theme="\(UIColor.isDarkModeEnabled ? "dark" : "light")>
         <base target="_blank">
         <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
         <style>
+        :root {
+            --tint-color: \(tintColor.cssString);
+            --background-color: \(UIColor.sileoBackgroundColor.cssString);
+            --content-background-color: \(UIColor.sileoContentBackgroundColor.cssString);
+            --highlight-color: \(UIColor.sileoHighlightColor.cssString);
+            --separator-color: \(UIColor.sileoSeparatorColor.cssString);
+            --label-color: \(UIColor.sileoLabel.cssString);
+        }
         body {
             margin: \(useSpacing ? "13px" : "0") \(useMargins ? "16px" : "0");
             background: transparent;
             font: -apple-system-body;
-            color: \(UIColor.sileoLabel.cssString);
+            color: var(--label-color);
             -webkit-text-size-adjust: none;
         }
         pre, xmp, plaintext, listing, tt, code, kbd, samp {
@@ -123,7 +131,7 @@ class DepictionMarkdownView: DepictionBaseView {
         }
         a {
             text-decoration: none;
-            color: \(tintColor.cssString);
+            color: var(--tint-color);
         }
         p, h1, h2, h3, h4, h5, h6, ul, ol {
             margin: 0 0 16px 0;
@@ -207,6 +215,7 @@ extension DepictionMarkdownView: WKNavigationDelegate {
         }
         switch navigationAction.navigationType {
         case .linkActivated, .formSubmitted:
+            // User tapped a link inside the web view.
             _ = DepictionButton.processAction(url.absoluteString, parentViewController: self.parentViewController, openExternal: false)
 
         case .other:
