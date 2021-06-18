@@ -14,15 +14,23 @@ import SafariServices
 class DepictionMarkdownView: DepictionBaseView {
 
     private static let webViewConfiguration: WKWebViewConfiguration = {
+        // Configures the web view to restrict all but the primary purpose of this feature.
+        // - No network requests are allowed. Resources can only be loaded from data: URLs, or
+        //   inline CSS.
+        // - Caching and data storage is in-memory only, in a unique data store per web view.
+        // - Navigation within the web view is not allowed.
+        // - JavaScript can only be executed by code injected by Sileo.
+        // Note: The CSP has "allow-scripts", which might seem contradictory, but this is only to
+        // allow our own injected JavaScript to execute. The webpage still can’t run its own JS.
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .nonPersistent()
         configuration.mediaTypesRequiringUserActionForPlayback = .all
         configuration.ignoresViewportScaleLimits = false
         configuration.dataDetectorTypes = []
-        configuration.preferences.javaScriptEnabled = false
-        configuration._overrideContentSecurityPolicy = "default-src data:; style-src data: 'unsafe-inline'; child-src 'none'; sandbox"
+        configuration._overrideContentSecurityPolicy = "default-src data:; style-src data: 'unsafe-inline'; script-src 'none'; child-src 'none'; sandbox allow-scripts"
         if #available(iOS 14, *) {
             configuration._loadsSubresources = false
+            configuration.defaultWebpagePreferences.allowsContentJavaScript = false
         }
         if #available(iOS 15, *) {
             configuration._allowedNetworkHosts = Set()
@@ -87,7 +95,7 @@ class DepictionMarkdownView: DepictionBaseView {
         
         weak var weakSelf = self
         NotificationCenter.default.addObserver(weakSelf as Any,
-                                               selector: #selector(reloadMarkdown),
+                                               selector: #selector(themeDidChange),
                                                name: SileoThemeManager.sileoChangedThemeNotification,
                                                object: nil)
     }
@@ -98,24 +106,16 @@ class DepictionMarkdownView: DepictionBaseView {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        self.reloadMarkdown()
+        self.themeDidChange()
     }
     
     @objc func reloadMarkdown() {
         let htmlString = """
         <!DOCTYPE html>
-        <html theme="\(UIColor.isDarkModeEnabled ? "dark" : "light")>
+        <html theme="\(UIColor.isDarkModeEnabled ? "dark" : "light")" style="\(cssVariables)">
         <base target="_blank">
         <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
         <style>
-        :root {
-            --tint-color: \(tintColor.cssString);
-            --background-color: \(UIColor.sileoBackgroundColor.cssString);
-            --content-background-color: \(UIColor.sileoContentBackgroundColor.cssString);
-            --highlight-color: \(UIColor.sileoHighlightColor.cssString);
-            --separator-color: \(UIColor.sileoSeparatorColor.cssString);
-            --label-color: \(UIColor.sileoLabel.cssString);
-        }
         body {
             margin: \(useSpacing ? "13px" : "0") \(useMargins ? "16px" : "0");
             background: transparent;
@@ -143,6 +143,31 @@ class DepictionMarkdownView: DepictionBaseView {
 
         webView.loadHTMLString(htmlString, baseURL: nil)
         self.setNeedsLayout()
+    }
+
+    private var cssVariables: String {
+        """
+        --tint-color: \(tintColor.cssString);
+        --background-color: \(UIColor.sileoBackgroundColor.cssString);
+        --content-background-color: \(UIColor.sileoContentBackgroundColor.cssString);
+        --highlight-color: \(UIColor.sileoHighlightColor.cssString);
+        --separator-color: \(UIColor.sileoSeparatorColor.cssString);
+        --label-color: \(UIColor.sileoLabel.cssString);
+        """.replacingOccurrences(of: "\n", with: " ")
+    }
+
+    @objc private func themeDidChange() {
+        if #available(iOS 14, *) {
+            let injectJS = """
+            document.documentElement.setAttribute("style", value);
+            """
+            webView.callAsyncJavaScript(injectJS, arguments: [ "value": cssVariables ], in: nil, in: .defaultClient, completionHandler: nil)
+        } else {
+            let injectJS = """
+            document.documentElement.setAttribute("style", "\(cssVariables)");
+            """
+            webView.evaluateJavaScript(injectJS, completionHandler: nil)
+        }
     }
 
     override func depictionHeight(width: CGFloat) -> CGFloat {
