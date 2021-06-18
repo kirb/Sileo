@@ -37,15 +37,9 @@ class DepictionTableButtonView: DepictionBaseView, UIGestureRecognizerDelegate {
 
         super.init(dictionary: dictionary, viewController: viewController, tintColor: tintColor, isActionable: isActionable)
 
-        let highlightImage = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
-            UIColor.sileoHighlightColor.setFill()
-            context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
-        }
-
         button.setTitle(title, for: .normal)
         button.titleLabel!.font = UIFont.systemFont(ofSize: 17)
         button.contentHorizontalAlignment = .leading
-        button.setBackgroundImage(highlightImage, for: .highlighted)
         button.addTarget(self, action: #selector(self.buttonTapped), for: .touchUpInside)
         self.addSubview(button)
 
@@ -58,6 +52,8 @@ class DepictionTableButtonView: DepictionBaseView, UIGestureRecognizerDelegate {
             loadRepoImage(repo)
             self.addSubview(repoIcon!)
         }
+
+        updateHighlight()
     }
     
     private func loadRepoImage(_ repo: String) {
@@ -96,7 +92,7 @@ class DepictionTableButtonView: DepictionBaseView, UIGestureRecognizerDelegate {
         button.setTitleColor(self.tintColor, for: .normal)
         chevronView.tintColor = self.tintColor
 
-        button.frame = self.bounds.insetBy(dx: 0, dy: -1)
+        button.frame = self.bounds.insetBy(dx: 0, dy: -2)
 
         if let repoIcon = repoIcon {
             repoIcon.frame = CGRect(x: 16, y: 4.5, width: 35, height: 35)
@@ -107,9 +103,9 @@ class DepictionTableButtonView: DepictionBaseView, UIGestureRecognizerDelegate {
         chevronView.frame = CGRect(x: self.bounds.size.width - 16 - 9, y: 15, width: 7, height: 13)
     }
 
-    override func accessibilityActivate() -> Bool {
-        self.buttonTapped(nil)
-        return true
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateHighlight()
     }
 
     @objc func buttonTapped(_ sender: UIButton?) {
@@ -123,5 +119,13 @@ class DepictionTableButtonView: DepictionBaseView, UIGestureRecognizerDelegate {
             return false
         }
         return DepictionButton.processAction(action, parentViewController: self.parentViewController, openExternal: openExternal)
+    }
+
+    private func updateHighlight() {
+        let highlightImage = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
+            UIColor.sileoHighlightColor.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        }
+        button.setBackgroundImage(highlightImage, for: .highlighted)
     }
 }
