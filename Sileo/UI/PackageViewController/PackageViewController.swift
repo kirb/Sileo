@@ -7,13 +7,10 @@
 //
 
 import Foundation
-import SafariServices
-import MessageUI
-
 import os.log
 
 class PackageViewController: SileoViewController, PackageQueueButtonDataProvider,
-    UIScrollViewDelegate, DepictionViewDelegate, MFMailComposeViewControllerDelegate {
+    UIScrollViewDelegate, DepictionViewDelegate {
     public var package: Package?
     public var depictionHeight = CGFloat(0)
 
@@ -583,20 +580,16 @@ class PackageViewController: SileoViewController, PackageQueueButtonDataProvider
             sharePopup.addAction(moreByDeveloper)
         
             let packageSupport = UIAlertAction(title: String(localizationKey: "Package_Support_Action"), style: .default) { _ in
-                if !MFMailComposeViewController.canSendMail() {
-                    let alertController = UIAlertController(title: String(localizationKey: "Email_Unavailable.Title", type: .error),
-                                                            message: String(localizationKey: "Email_Unavailable.Body", type: .error),
-                                                            preferredStyle: .alert)
-                    alertController.addAction(UIAlertAction(title: String(localizationKey: "OK"), style: .cancel, handler: nil))
-                    self.present(alertController, animated: true, completion: nil)
-                } else {
-                    let composeVC = MFMailComposeViewController()
-                    composeVC.setToRecipients([email])
-                    composeVC.setSubject("Sileo/APT(M): \(String(describing: package.name))")
-                    composeVC.setMessageBody("", isHTML: false)
-                    composeVC.mailComposeDelegate = self
-                    self.present(composeVC, animated: true, completion: nil)
+                if let url = URLManager.supportEmailURL(to: email, for: package.name ?? package.packageID),
+                   DepictionButton.processAction(url.absoluteString, parentViewController: self, openExternal: false) {
+                    return
                 }
+
+                let alertController = UIAlertController(title: String(localizationKey: "Email_Unavailable.Title", type: .error),
+                                                        message: String(localizationKey: "Email_Unavailable.Body", type: .error),
+                                                        preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: String(localizationKey: "OK"), style: .cancel, handler: nil))
+                self.present(alertController, animated: true, completion: nil)
             }
             sharePopup.addAction(packageSupport)
         }
@@ -643,13 +636,6 @@ class PackageViewController: SileoViewController, PackageQueueButtonDataProvider
             sharePopup.view.tintColor = tintColor
         }
         self.present(sharePopup, animated: true)
-    }
-
-    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-        // Check the result or perform other tasks.
-
-        // Dismiss the mail compose view controller.
-        self.dismiss(animated: true, completion: nil)
     }
 
     @objc func dismissImmediately() {

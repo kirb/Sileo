@@ -80,4 +80,12 @@ class URLManager {
         alertController.addAction(UIAlertAction(title: String(localizationKey: "OK"), style: .cancel, handler: nil))
         return alertController
     }
+
+    static func supportEmailURL(to email: String, for packageName: String) -> URL? {
+        var components = URLComponents()
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: "Sileo/APT(M): \(packageName)")
+        ]
+        return URL(string: "mailto:\(email)?\(components.percentEncodedQuery ?? "")")
+    }
 }

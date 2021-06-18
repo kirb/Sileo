@@ -37,7 +37,7 @@ class DepictionButton: UIButton {
     
     static func processAction(_ action: String, parentViewController: UIViewController?, openExternal: Bool) -> Bool {
         if action.hasPrefix("http"),
-            let url = URL(string: action) {
+           let url = URL(string: action) {
             if openExternal {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             } else {
@@ -49,9 +49,11 @@ class DepictionButton: UIButton {
                     }
                 }
             }
-        } else if action.hasPrefix("mailto"),
-            let url = URL(string: action) {
+            return true
+        } else if action.hasPrefix("mailto:"),
+                  let url = URL(string: action) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            return true
         } else if action == "showInstalledContents" {
             if let packageViewController = parentViewController as? PackageViewController {
                 let contentsViewController = InstalledContentsViewController(nibName: "InstalledContentsViewController", bundle: nil)
@@ -85,12 +87,14 @@ class DepictionButton: UIButton {
                 let subpageController = DepictionSubpageViewController(nibName: "DepictionSubpageViewController", bundle: nil)
                 subpageController.depictionURL = URL(string: String(action.dropFirst(10)))
                 parentViewController?.navigationController?.pushViewController(subpageController, animated: true)
+                return true
             } else if url.isSecure(prefix: "form") {
                 if let formURL = URL(string: String(action.dropFirst(5))) {
                     let formController = DepictionFormViewController(formURL: formURL)
                     let navController = UINavigationController(rootViewController: formController)
                     navController.modalPresentationStyle = .formSheet
                     parentViewController?.present(navController, animated: true, completion: nil)
+                    return true
                 }
             } else {
                 var presentModally = false
@@ -100,6 +104,7 @@ class DepictionButton: UIButton {
                     } else {
                         parentViewController?.navigationController?.pushViewController(controller, animated: true)
                     }
+                    return true
                 }
             }
         }
