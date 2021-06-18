@@ -58,7 +58,7 @@ final class ControlFileParser {
         guard let emailIndex = string.firstIndex(of: "<") else {
             return nil
         }
-        let email = string[emailIndex...]
+        let email = string[string.index(after: emailIndex)...]
         guard let emailLastIndex = email.firstIndex(of: ">") else {
             return nil
         }
