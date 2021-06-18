@@ -47,7 +47,6 @@ class DepictionMarkdownView: DepictionBaseView {
 
     private let webView: WKWebView
     private var contentSizeObserver: NSKeyValueObservation!
-    private var heightConstraint: NSLayoutConstraint!
 
     required init?(dictionary: [String: Any], viewController: UIViewController, tintColor: UIColor, isActionable: Bool) {
         guard let markdown = dictionary["markdown"] as? String else {
@@ -69,6 +68,10 @@ class DepictionMarkdownView: DepictionBaseView {
         webView.isOpaque = false
         addSubview(webView)
 
+        contentSizeObserver = webView.scrollView.observe(\.contentSize) { _, _ in
+            self.subviewHeightChanged()
+        }
+
         if useRawFormat {
             htmlString = markdown
         } else {
@@ -80,17 +83,11 @@ class DepictionMarkdownView: DepictionBaseView {
 
         reloadMarkdown()
 
-        heightConstraint = webView.heightAnchor.constraint(equalToConstant: 0)
-        contentSizeObserver = webView.scrollView.observe(\.contentSize) { _, _ in
-            self.heightConstraint.constant = self.webView.scrollView.contentSize.height
-        }
-
         NSLayoutConstraint.activate([
             webView.leftAnchor.constraint(equalTo: self.leftAnchor),
             webView.rightAnchor.constraint(equalTo: self.rightAnchor),
             webView.topAnchor.constraint(equalTo: self.topAnchor),
-            webView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            heightConstraint
+            webView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
         ])
         
         weak var weakSelf = self

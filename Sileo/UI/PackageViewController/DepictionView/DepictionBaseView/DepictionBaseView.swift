@@ -26,7 +26,7 @@ open class DepictionBaseView: UIView, DepictionViewProtocol {
     public var isHighlighted: Bool = false
 
     class func view(dictionary: [String: Any], viewController: UIViewController, tintColor: UIColor?, isActionable: Bool) -> DepictionBaseView? {
-        guard var className = dictionary["class"] as? String else {
+        guard let className = dictionary["class"] as? String else {
             return nil
         }
         
